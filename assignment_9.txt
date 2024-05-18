@@ -1,0 +1,82 @@
+-- A-1: EID, NAME, CITY OF GURGAON EMPLOYEES
+-- A-2: EID, NAME , DOJ ,DEPT, DESI & SALARY OF ALL MANAGERS  
+-- A-3: REDUCE THE SALARY OF ALL DELHI EMPLOYEES BY 10%.
+
+-- A-4 : DISPLAY THE EID, NAME , CITY, DOJ ,DEPT, DESI & SALARY OF THE TEAM  MEMBERS OF DAVID & RAMESH GUPTA.
+
+-- A-5: CREATE A TRAINING TABLE CONTAINING EID, NAME, DEPT. INSERT THE DETAILS
+-- OF OPS TEAM MEMBERS IN THE TRAINING TABLE.
+
+-- A-6: DETAILS OF DIRECTORS SHOULD BE DELETED FROM THE TRAINING TABLE.
+
+-- A-7: DISPLAY THE SALARY DETAILS OFF ALL EMPLOYES IF ANY OF THE TEAM MEMBER  HAS SALARY MORE THAN 200000.
+
+
+-- A-1: EID, NAME, CITY OF GURGAON EMPLOYEES
+
+use assignment;
+select *from emp;
+select EID, name
+from emp
+where city = 'gurgaon';
+
+-- nested statement
+select eid, name from emp
+where eid in (select eid from emp where city = 'gurgaon');  
+
+-- A-2: EID, NAME , DOJ ,DEPT, DESI & SALARY OF ALL MANAGERS 
+select *from emp_sal;
+ 
+select E.EID, E.NAME , E.DOJ ,Es.DEPT, Es.DESI, Es.SALARY 
+from emp E
+inner join emp_sal Es
+where E.eid in (select Es.eid from emp_sal
+								where Es.desi = 'manager');  
+
+
+-- A-3: REDUCE THE SALARY OF ALL DELHI EMPLOYEES BY 10%.
+
+select round(Es.salary*10/100, 0) as red_sal 
+from emp_sal Es 
+inner join emp E
+where E.eid in ( select E.eid from emp_sal where E.city = 'delhi');
+
+-- A-4 : DISPLAY THE EID, NAME , CITY, DOJ ,DEPT, DESI & SALARY OF THE TEAM  MEMBERS OF DAVID & RAMESH GUPTA.
+
+select E.EID, E.NAME , E.CITY, E.DOJ , Es.DEPT, Es.DESI , Es.SALARY
+from emp E
+inner join emp_sal Es
+where E.name in (select E.name from emp
+					where E.name = 'DAVID' OR E.name = 'RAMESH GUPTA' );  
+                    
+-- A-5: CREATE A TRAINING TABLE CONTAINING EID, NAME, DEPT. INSERT THE DETAILS
+-- OF OPS TEAM MEMBERS IN THE TRAINING TABLE.
+
+create table train_team as 
+select E.EID, E.NAME, Es.DEPT
+from emp E 
+inner join emp_sal Es
+where Es.dept = 'ops';
+
+select *from train_team;    
+
+-- A-6: DETAILS OF DIRECTORS SHOULD BE DELETED FROM THE TRAINING TABLE.
+select *from emp_Sal;
+
+delete from emp_sal 
+where desi = 'director';
+rollback;
+SET autocommit = 0;
+
+committed(saved);
+
+select *from emp_sal;
+rollbak;
+
+-- A-7: DISPLAY THE SALARY DETAILS OFF ALL EMPLOYES IF ANY OF THE TEAM MEMBER  HAS SALARY MORE THAN 200000.
+
+select salary
+from emp_sal
+where salary in (select salary from emp_Sal 
+					where salary > 200000);
+                    
